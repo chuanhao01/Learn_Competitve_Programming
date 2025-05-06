@@ -1,36 +1,35 @@
 {
-  description = "Rust devShell with rust-analyzer support";
+  description = "A devShell example";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
-    flake-utils.url = "github:numtide/flake-utils";
+    nixpkgs.url      = "github:NixOS/nixpkgs/nixos-unstable";
     rust-overlay.url = "github:oxalica/rust-overlay";
+    flake-utils.url  = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils, rust-overlay, ... }:
+  outputs = { self, nixpkgs, rust-overlay, flake-utils, ... }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         overlays = [ (import rust-overlay) ];
         pkgs = import nixpkgs {
           inherit system overlays;
         };
-
-        rust = pkgs.rust-bin.stable.latest.complete.override {
-          extensions = [ "rust-src" ]; # needed for rust-analyzer
-        };
-      in {
-        devShells.default = pkgs.mkShell {
+      in
+      {
+        devShells.default = with pkgs; mkShell {
           buildInputs = [
-            rust
-            pkgs.rust-analyzer
+            openssl
+            pkg-config
+            eza
+            fd
+            rust-bin.beta.latest.default
           ];
 
-          # Optional: tell rust-analyzer where rust-src is
-          RUST_SRC_PATH = "${rust}/lib/rustlib/src/rust/library";
-
           shellHook = ''
-            echo "✅ Rust devShell ready"
+            alias ls=eza
+            alias find=fd
           '';
         };
-      });
+      }
+    );
 }
