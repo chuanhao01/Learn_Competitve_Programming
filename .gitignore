@@ -3,3 +3,6 @@
 
 # Ensure .additional folder is added
 !.additional/**/*
+
+# direnv
+.direnv
