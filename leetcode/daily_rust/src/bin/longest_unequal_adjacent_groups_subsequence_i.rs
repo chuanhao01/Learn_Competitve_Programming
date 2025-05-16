@@ -5,24 +5,17 @@ impl Solution {
         if groups.len() == 1 {
             return words;
         }
-        let mut l = 0;
-        let mut r = 1;
-        let mut longest = (0, 0);
+        let mut i = 1;
         let mut prev = groups[0];
-        while r < groups.len() {
-            if groups[r as usize] + prev == 1 {
-                if (r - l) > (longest.1 - longest.0) {
-                    longest = (l, r);
-                }
-            } else {
-                l = r;
+        let mut ans = Vec::from([words[0].clone()]);
+        while i < groups.len() {
+            if prev != groups[i] {
+                prev = groups[i];
+                ans.push(words[i].clone());
             }
-            prev = groups[r as usize];
-            r += 1;
+            i += 1;
         }
-        // println!("{:?}", longest);
-        // println!("{:?}", words[longest.0..longest.1 + 1].to_vec());
-        words[longest.0..longest.1 + 1].to_vec()
+        ans
     }
 }
 
