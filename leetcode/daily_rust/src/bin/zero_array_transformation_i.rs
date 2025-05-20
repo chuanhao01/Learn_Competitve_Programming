@@ -13,9 +13,14 @@ impl Solution {
         let mut prefix_sum = 0;
         for i in 0..nums.len() {
             prefix_sum += diff_arr[i];
-            nums[i] = (nums[i] - prefix_sum).max(0);
+            // nums[i] = (nums[i] - prefix_sum).max(0);
+            nums[i] -= prefix_sum;
+            if nums[i] > 0 {
+                return false;
+            }
         }
-        nums.iter().all(|n| *n == 0)
+        // nums.iter().all(|n| *n == 0)
+        true
     }
 }
 
