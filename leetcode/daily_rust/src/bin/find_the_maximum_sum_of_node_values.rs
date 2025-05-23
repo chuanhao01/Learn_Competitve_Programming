@@ -2,26 +2,29 @@
 struct Solution {}
 impl Solution {
     pub fn maximum_value_sum(nums: Vec<i32>, k: i32, edges: Vec<Vec<i32>>) -> i64 {
-        let mut nums = nums;
-        // Just try all once haha
-        let mut change = false;
-        while !change {
-            change = true;
-            for edge in &edges {
-                let ui = edge[0] as usize;
-                let vi = edge[1] as usize;
-                let u = nums[ui];
-                let v = nums[vi];
-                let nu = u ^ k;
-                let nv = v ^ k;
-                if (nu + nv) > (u + v) {
-                    nums[ui] = nu;
-                    nums[vi] = nv;
-                    change = false;
-                }
+        let mut nums = nums.iter().map(|n| *n as i64).collect::<Vec<i64>>();
+        let k = k as i64;
+        // The trick is that since all nodes have to be connected, any even no. of operations can be done on any node
+        // For odd no. we need to do the least sum reducing op
+
+        // Maximize all nums with xor and keep track
+        let mut count = 0;
+        for i in 0..nums.len() {
+            let nn = nums[i] ^ k;
+            if nn > nums[i] {
+                count += 1;
+                nums[i] = nn;
             }
         }
-        nums.iter().sum::<i32>() as i64
+        let s = nums.iter().sum();
+        if count % 2 == 0 {
+            s
+        } else {
+            // In this case
+            // If we got a bigger n^k, n - n^k would give us the reduction in the max sum turning it back to n
+            // If we did not touch it, n - n^k would give us the reduction in max sum
+            s - nums.iter().map(|n| (n - (n ^ k))).min().unwrap()
+        }
     }
 }
 
