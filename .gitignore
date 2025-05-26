@@ -5,4 +5,5 @@
 !.additional/**/*
 
 # direnv
+.envrc
 .direnv
