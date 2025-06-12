@@ -5,7 +5,8 @@
   "rust-analyzer.lens.debug.enable": false,
   "[rust]": {
     "editor.formatOnSave": true,
-    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+    "editor.defaultFormatter": "rust-lang.rust-analyzer",
+    "editor.tabSize": 4
   },
   "rust-analyzer.linkedProjects": [
     "./leetcode/daily_rust/Cargo.toml"
