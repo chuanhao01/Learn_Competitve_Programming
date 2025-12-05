@@ -1,5 +1,4 @@
-# AOC2024
+# AOC2025
 
-On holiday
+NUS
 So eh
-
