@@ -3,6 +3,7 @@ use std::{
     fmt::Display,
     fs::File,
     io::{Read, Result},
+    time::Instant,
     vec,
 };
 
@@ -65,6 +66,7 @@ fn main() -> Result<()> {
     // Get the ranges
     let mut sum = 0;
 
+    let start = Instant::now();
     let mut points: Vec<Point> = Vec::new();
     for l in input.lines() {
         if l.is_empty() {
@@ -91,7 +93,7 @@ fn main() -> Result<()> {
         }
     }
     dists.sort_by(|a, b| a.2.cmp(&b.2));
-    println!("{:?}", dists.len());
+    // println!("{:?}", dists.len());
 
     // Removing dupes
     let mut new_dists: Vec<(usize, usize, usize)> = Vec::new();
@@ -111,7 +113,7 @@ fn main() -> Result<()> {
     dists = new_dists;
 
     // println!("{:?}", dists);
-    println!("{:?}", dists.len());
+    // println!("{:?}", dists.len());
     // println!("{:?}", dists[0..10].iter().collect::<Vec<_>>());
 
     // Union find
@@ -125,7 +127,9 @@ fn main() -> Result<()> {
         j += 1;
     }
     let dist = dists[j - 1];
-    println!("{}, {}", points[dist.0], points[dist.1]);
+    // println!("{}, {}", points[dist.0], points[dist.1]);
+    let end = Instant::now();
+    println!("{:?}", end - start);
 
     println!("sum: {}", points[dist.0].x * points[dist.1].x);
     Ok(())
