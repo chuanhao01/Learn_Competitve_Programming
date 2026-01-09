@@ -15,6 +15,10 @@ fn main() -> Result<()> {
     // Get the ranges
     let mut sum = 0;
     let mut hm: HashMap<String, Vec<String>> = HashMap::new();
+
+    let mut i = 0;
+    let mut idx: HashMap<String, usize> = HashMap::new();
+    let mut f: Vec<String> = Vec::new();
     for l in input.split("\n") {
         if l.is_empty() {
             break;
@@ -27,52 +31,81 @@ fn main() -> Result<()> {
             .split(" ")
             .map(|s| s.to_string())
             .collect::<Vec<String>>();
-        // hm.insert(k, v);
-        for vv in v {
-            hm.entry(vv)
-                .and_modify(|e| e.push(k.clone()))
-                .or_insert(vec![k.clone()]);
+        if !idx.contains_key(&k) {
+            idx.insert(k.clone(), i);
+            i += 1;
         }
+        for vv in &v {
+            if !idx.contains_key(vv) {
+                idx.insert(vv.clone(), i);
+                i += 1;
+            }
+            f.push(format!("{},{}", idx[&k], idx[vv]));
+        }
+        hm.insert(k, v);
     }
-    println!("{:?}", hm);
-    // let mut q: VecDeque<(String, bool, bool, HashSet<String>)> = VecDeque::new();
-    let mut q: VecDeque<(String, bool, bool)> = VecDeque::new();
-    for v in &hm["out"] {
-        // q.push_back((v.clone(), false, false, HashSet::from(["svr".to_string()])));
-        q.push_back((v.clone(), false, false));
+    // println!("{:?}", idx);
+    // println!("{:?}", hm);
+    // println!("{}", f.join("\n"));
+
+    // let b = dfs("svr".to_string(), "out".to_string(), &hm);
+    // let b = dfs("svr".to_string(), "fft".to_string(), &hm);
+    // let c = dfs("fft".to_string(), "dac".to_string(), &hm);
+    // let a = dfs("dac".to_string(), "out".to_string(), &hm);
+
+    let b = dfs("you".to_string(), "out".to_string(), &hm);
+
+    println!("{}", b);
+
+    // println!("sum: {}", a * b * c);
+    Ok(())
+}
+
+fn dfs(start: String, end: String, hm: &HashMap<String, Vec<String>>) -> usize {
+    let mut dp: HashSet<(String, String)> = HashSet::new();
+    let mut off: HashSet<(String, String)> = HashSet::new();
+    let mut q: VecDeque<(String, Vec<(String, String)>)> = VecDeque::new();
+    for v in &hm[&start] {
+        q.push_back((v.clone(), Vec::new()));
     }
-    // println!("{:?}", q);
+    let mut sum = 0;
     while !q.is_empty() {
         println!("{:?}", q.len());
-        let mut entry = q.pop_front().unwrap();
-        println!("{:?}", entry);
+        let entry = q.pop_back().unwrap();
+        // println!("{:?}", entry);
         let k = entry.0;
-        if k == "svr" {
-            if entry.1 && entry.2 {
-                sum += 1;
+        if k == end {
+            for e in entry.1 {
+                dp.insert(e.clone());
             }
+            sum += 1;
             continue;
         }
         if !hm.contains_key(&k) {
+            for e in entry.1 {
+                off.insert(e.clone());
+            }
             continue;
         }
-        if k == "dac" {
-            entry.1 = true;
-        }
-        if k == "fft" {
-            entry.2 = true;
-        }
         for v in &hm[&k] {
-            // let mut new_seen = entry.3.clone();
-            // new_seen.insert(k.clone());
-            // if !entry.3.contains(v) {
-            //     q.push_back((v.clone(), entry.1, entry.2, new_seen.clone()));
-            // }
+            if dp.contains(&(k.clone(), v.clone())) {
+                for e in &entry.1 {
+                    dp.insert(e.clone());
+                }
+                sum += 1;
+                continue;
+            }
+            if off.contains(&(k.clone(), v.clone())) {
+                for e in &entry.1 {
+                    off.insert(e.clone());
+                }
+                continue;
+            }
 
-            q.push_back((v.clone(), entry.1, entry.2));
+            let mut n = entry.1.clone();
+            n.push((k.clone(), v.clone()));
+            q.push_back((v.clone(), n));
         }
     }
-
-    println!("sum: {}", sum);
-    Ok(())
+    sum
 }
