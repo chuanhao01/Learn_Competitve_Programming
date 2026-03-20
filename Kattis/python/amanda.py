@@ -12,6 +12,7 @@ def main():
 
     nodes = [-1 for _ in range(n + 1)]
     adj_list = [[] for _ in range(n + 1)]
+    nodes_to_check = [0 for _ in range(n + 1)]
 
     # parse nodes
     for _ in range(m):
@@ -28,31 +29,100 @@ def main():
         else:
             adj_list[e1].append(e2)
             adj_list[e2].append(e1)
+            nodes_to_check[e1] = 1
+            nodes_to_check[e2] = 1
 
     # print(nodes)
     # print(adj_list)
 
+    # print(nodes_to_check)
     # Form and check bipartite graph
-    for node in range(1, n+1):
-        # Visited the node, skip
-        if nodes[node] >= 0:
+    visited = [False for _ in range(n + 1)]
+    for i in range(n+1):
+        if nodes_to_check[i] == 0:
             continue
-        q = deque([node])
+        if visited[i]:
+            continue
+
+        # BFS to find the first node with a known value
+        q = deque([i])
+        start_node = None
         while len(q) > 0:
-            cn = q.popleft()
-            if nodes[cn] >= 0:
+            node = q.popleft()
+            if visited[i]:
                 continue
+            visited[i] = True
+            if nodes[node] != -1:
+                start_node = node
+                break
             for neighbour in adj_list[node]:
-                if nodes[neighbour] >= 0:
-                    # check if this edge joins 2 same color nodes
-                    if nodes[neighbour] == nodes[cn]:
-                        print("impossible")
-                        return
+                q.append(neighbour)
+
+        # Bipartite and flip all
+        if start_node is None:
+            continue
+        new_visited = [False for _ in range(n + 1)]
+        q = deque([start_node])
+        while len(q) > 0:
+            node = q.popleft()
+            if new_visited[node]:
+                continue
+            new_visited[node] = True
+            for neighbour in adj_list[node]:
+                if nodes[neighbour] == nodes[node]:
+                    print("impossible")
+                    return
+                if new_visited[neighbour]:
+                    continue
                 else:
-                    if nodes[cn] >= 0:
-                        nodes[neighbour] = 0 if nodes[cn] == 1 else 1
+                    nodes[neighbour] = 0 if nodes[node] == 1 else 1
                     q.append(neighbour)
-    print(nodes)
+
+    all_ones = 0
+    for c in nodes:
+        if c == 1:
+            all_ones += 1
+
+    # print(nodes)
+    final_nodes = []
+    # Final bipartite
+    for i in range(1, n+1):
+        if nodes[i] == -1:
+            final_nodes.append(i)
+    # print(final_nodes)
+    min_counts = 0
+    new_visited = [False for _ in range(n + 1)]
+    for i in final_nodes:
+        if new_visited[i]:
+            continue
+        counts = [-1 for _ in range(n+1)]
+        counts[i] = 0
+        q = deque([i])
+        while len(q) > 0:
+            node = q.popleft()
+            if new_visited[node]:
+                continue
+            new_visited[node] = True
+            for neighbour in adj_list[node]:
+                if counts[neighbour] == counts[node]:
+                    print("impossible")
+                    return
+                if new_visited[neighbour]:
+                    continue
+                else:
+                    counts[neighbour] = 0 if counts[node] == 1 else 1
+                    q.append(neighbour)
+        zeros = 0
+        ones = 0
+        for c in counts:
+            if c == 0:
+                zeros += 1
+            elif c == 1:
+                ones += 1
+        min_counts += min(zeros, ones)
+    # print(min_counts + all_ones)
+    print(all_ones)
+
 
 
 
